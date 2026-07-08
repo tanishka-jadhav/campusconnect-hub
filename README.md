@@ -180,3 +180,4 @@ The AI service is implemented in `src/services/groq.js` as a clean fetch client 
 ## License
 
 MIT
+# campusconnect-hub
