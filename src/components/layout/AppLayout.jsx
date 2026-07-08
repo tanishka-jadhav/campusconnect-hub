@@ -1,9 +1,10 @@
 import { useState } from 'react';
+import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../ui/Button';
 import {
   Home, ShoppingBag, Users, Briefcase, FolderOpen,
-  LogOut, GraduationCap, Menu, X, ChevronRight
+  LogOut, GraduationCap, Menu, X, ChevronRight, Sun, Moon
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -16,6 +17,7 @@ const NAV_ITEMS = [
 
 export default function AppLayout({ activeModule, onNavigate, children }) {
   const { user, profile, signOut } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   async function handleSignOut() {
@@ -65,18 +67,23 @@ export default function AppLayout({ activeModule, onNavigate, children }) {
 
         {/* User Profile */}
         <div className="p-4 border-t border-border">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-gradient-start to-gradient-end flex items-center justify-center text-white text-sm font-bold shrink-0">
-              {(profile?.full_name || user?.email || 'U')[0].toUpperCase()}
+          <div className="flex items-center justify-between mb-3 gap-2">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-gradient-start to-gradient-end flex items-center justify-center text-white text-sm font-bold shrink-0">
+                {(profile?.full_name || user?.email || 'U')[0].toUpperCase()}
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-foreground truncate">
+                  {profile?.full_name || 'Campus User'}
+                </p>
+                <p className="text-xs text-muted-foreground truncate">
+                  {profile?.college || user?.email}
+                </p>
+              </div>
             </div>
-            <div className="min-w-0">
-              <p className="text-sm font-medium text-foreground truncate">
-                {profile?.full_name || 'Campus User'}
-              </p>
-              <p className="text-xs text-muted-foreground truncate">
-                {profile?.college || user?.email}
-              </p>
-            </div>
+            <Button variant="ghost" size="icon" onClick={toggleTheme} className="shrink-0 text-muted-foreground hover:text-foreground cursor-pointer" id="theme-toggle">
+              {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </Button>
           </div>
           <Button variant="ghost" size="sm" className="w-full justify-start text-muted-foreground" onClick={handleSignOut} id="nav-signout">
             <LogOut className="h-4 w-4" /> Sign Out
@@ -120,7 +127,22 @@ export default function AppLayout({ activeModule, onNavigate, children }) {
                 );
               })}
             </nav>
-            <div className="p-4 border-t border-border">
+            <div className="p-4 border-t border-border space-y-3">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-gradient-start to-gradient-end flex items-center justify-center text-white text-sm font-bold shrink-0">
+                    {(profile?.full_name || user?.email || 'U')[0].toUpperCase()}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">
+                      {profile?.full_name || 'Campus User'}
+                    </p>
+                  </div>
+                </div>
+                <Button variant="ghost" size="icon" onClick={toggleTheme} className="shrink-0 text-muted-foreground hover:text-foreground">
+                  {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                </Button>
+              </div>
               <Button variant="ghost" size="sm" className="w-full justify-start text-muted-foreground" onClick={handleSignOut}>
                 <LogOut className="h-4 w-4" /> Sign Out
               </Button>

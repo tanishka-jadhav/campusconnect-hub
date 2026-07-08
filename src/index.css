@@ -1,28 +1,80 @@
 @import "tailwindcss";
 
+:root {
+  --background: #f8f9fa;
+  --foreground: #121216;
+  --card: #ffffff;
+  --card-foreground: #121216;
+  --popover: #ffffff;
+  --popover-foreground: #121216;
+  --primary: #593ed3;
+  --primary-foreground: #ffffff;
+  --secondary: #f1f3f7;
+  --secondary-foreground: #121216;
+  --muted: #eef1f6;
+  --muted-foreground: #676778;
+  --accent: #eef1f6;
+  --accent-foreground: #121216;
+  --border: #dcdce6;
+  --input: #dcdce6;
+  --ring: #593ed3;
+  --success: #2c8a81;
+  --warning: #b7911b;
+  --info: #2b77c1;
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-bg-card: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(89, 62, 211, 0.12);
+}
+
+.dark {
+  --background: #0a0a0f;
+  --foreground: #e8e8ed;
+  --card: #12121a;
+  --card-foreground: #e8e8ed;
+  --popover: #12121a;
+  --popover-foreground: #e8e8ed;
+  --primary: #6d5acd;
+  --primary-foreground: #ffffff;
+  --secondary: #1a1a2e;
+  --secondary-foreground: #e8e8ed;
+  --muted: #16162a;
+  --muted-foreground: #8888a0;
+  --accent: #1e1e3a;
+  --accent-foreground: #e8e8ed;
+  --border: #2a2a40;
+  --input: #2a2a40;
+  --ring: #6d5acd;
+  --success: #38b2ac;
+  --warning: #ecc94b;
+  --info: #4299e1;
+  --glass-bg: rgba(18, 18, 26, 0.75);
+  --glass-bg-card: rgba(18, 18, 26, 0.65);
+  --glass-border: rgba(109, 90, 205, 0.18);
+}
+
 @theme {
-  --color-background: #0a0a0f;
-  --color-foreground: #e8e8ed;
-  --color-card: #12121a;
-  --color-card-foreground: #e8e8ed;
-  --color-popover: #12121a;
-  --color-popover-foreground: #e8e8ed;
-  --color-primary: #6d5acd;
-  --color-primary-foreground: #ffffff;
-  --color-secondary: #1a1a2e;
-  --color-secondary-foreground: #e8e8ed;
-  --color-muted: #16162a;
-  --color-muted-foreground: #8888a0;
-  --color-accent: #1e1e3a;
-  --color-accent-foreground: #e8e8ed;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
   --color-destructive: #e53e3e;
   --color-destructive-foreground: #ffffff;
-  --color-border: #2a2a40;
-  --color-input: #2a2a40;
-  --color-ring: #6d5acd;
-  --color-success: #38b2ac;
-  --color-warning: #ecc94b;
-  --color-info: #4299e1;
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
   --color-gradient-start: #6d5acd;
   --color-gradient-mid: #9f7aea;
   --color-gradient-end: #ed64a6;
@@ -46,6 +98,7 @@ body {
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 ::-webkit-scrollbar {
@@ -75,8 +128,8 @@ body {
   to { opacity: 0; transform: translateX(100%); }
 }
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 15px rgba(109, 90, 205, 0.3); }
-  50% { box-shadow: 0 0 30px rgba(109, 90, 205, 0.6); }
+  0%, 100% { box-shadow: 0 0 15px rgba(109, 90, 205, 0.2); }
+  50% { box-shadow: 0 0 30px rgba(109, 90, 205, 0.4); }
 }
 @keyframes shimmer {
   0% { background-position: -200% 0; }
@@ -97,23 +150,23 @@ body {
 }
 
 .glass {
-  background: rgba(18, 18, 26, 0.7);
+  background: var(--glass-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(109, 90, 205, 0.15);
+  border: 1px solid var(--glass-border);
 }
 
 .glass-card {
-  background: rgba(18, 18, 26, 0.6);
+  background: var(--glass-bg-card);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--glass-border);
   transition: all 0.3s ease;
 }
 .glass-card:hover {
   border-color: rgba(109, 90, 205, 0.3);
   transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(109, 90, 205, 0.15);
+  box-shadow: 0 8px 32px rgba(109, 90, 205, 0.12);
 }
 
 .gradient-text {
@@ -148,7 +201,7 @@ body {
 .drawer-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(4px);
   z-index: 50;
 }
