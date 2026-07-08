@@ -193,3 +193,60 @@ Build an AI-driven matchmaking algorithm that automatically parses the skills pr
 
 ### 4. Interactive Campus Map
 Integrate Mapbox or Google Maps API into the **Housing Hub** to display housing listings visually relative to the university campus boundaries, helping students calculate walking/transit times.
+
+---
+
+## 7. Capstone Presentation & Demo Video Guide
+
+### 7.1 Presentation Strategy (10-Minute Slide Outline)
+If you need to present to a panel or jury, structure your talk like this:
+
+*   **Slide 1: Title & Hook (1 min)**
+    *   *Topic*: CampusConnect Hub — A secure, unified ecosystem for university students.
+    *   *Say*: Explain the problem statement: legacy university platforms (WhatsApp, Slack, FB groups) are fragmented, insecure, and filled with spam/scams.
+*   **Slide 2: System Architecture (2 min)**
+    *   *Topic*: The Serverless Stack.
+    *   *Say*: Walk through the Mermaid diagram. Highlight React 19 + Tailwind v4 compiling to static assets, Supabase providing secure serverless Postgres/Auth/Storage, and Groq running lightning-fast LLaMA-3.1 inference.
+*   **Slide 3: Trust & Accountability UVP (2 min)**
+    *   *Topic*: Domain Verification & Row Level Security.
+    *   *Say*: Explain the educational domain regex validation (`.edu`). Explain how Row Level Security policies at the database layer guarantee data integrity without needing a custom middle tier.
+*   **Slide 4: Live Demo / Walkthrough (3 min)**
+    *   *Topic*: Live features. Show the live app on Vercel.
+*   **Slide 5: Key Learnings & Future Roadmap (2 min)**
+    *   *Topic*: Edge Functions, WebSockets, Maps.
+    *   *Say*: Summarize what you learned (migrating Groq model versions, responsive container layouts) and explain future scalability plans.
+
+---
+
+### 7.2 3-Minute Loom Demo Video Script
+Use a tool like Loom or OBS. Record in a single, uninterrupted take. Follow this timeline:
+
+#### **Preparation Setup**
+*   Open the live deployed URL: `https://campusconnect-hub.vercel.app`
+*   Log in using the seed account: `jane.doe@college.edu` / `Test1234!`
+*   Have the **Resources** module open.
+
+#### **0:00 – 0:30 | Introduction & Login**
+*   *Action*: Start with your camera enabled in the bottom corner of Loom.
+*   *Script*: "Hi everyone! Welcome to my Capstone project, CampusConnect Hub. This is a unified, secure platform built for verified student communities. To start, it enforces client-side educational email domain checks at sign-up, ensuring only students from verified institutions can gain access, backed by a clear institutional accountability banner."
+
+#### **0:30 – 1:15 | Housing & P2P Marketplace**
+*   *Action*: Click on the **Housing Hub** in the sidebar. Show the filters.
+*   *Script*: "First, we have the Housing Hub. Students can browse, list, and filter rentals near campus by budget. If a student is interested, they can initiate a call or tap the green button to trigger a pre-formatted WhatsApp chat. The same flow carries into our Marketplace, which allows students to buy and sell textbooks, electronics, and furniture safely within their school network."
+*   *Action*: Switch to **Marketplace** and show the cards.
+
+#### **1:15 – 2:00 | Team-Up Matchmaking**
+*   *Action*: Click on the **Team-Up** tab.
+*   *Script*: "For group projects and hackathons, we built the Team-Up board. Students list their ideas and search for partners using skill tags. In case a user's local operating system doesn't have a default email client set up for mailto links, we've integrated a one-click Copy button to copy the contact details to the clipboard instantly."
+*   *Action*: Click "Copy" on a team card and trigger the copy alert.
+
+#### **2:00 – 2:45 | AI-Powered Career & Resources (The Core AI Integration)**
+*   *Action*: Switch to the **Career Board**. Click "Polish Referral".
+*   *Script*: "Next is the Career Board, where we integrate Groq's high-speed inference engine using the LLaMA-3.1 model. If a student needs a referral request polished, they can paste their rough notes here. The AI transforms it into a professional message in real-time."
+*   *Action*: Paste: `need SWE referral for Stripe. I do React. MIT grad.` Click **Polish My Referral** and show the result.
+*   *Action*: Switch to **Resources** and click "Summarize" on the *Data Structures Final Review Notes* card. Click **Summarize Notes**.
+*   *Script*: "Finally, in the Resources drive, students upload study materials to Supabase Storage. Clicking 'Summarize Notes' triggers the LLaMA model to convert dense study notes into clear, bulleted key takeaways instantly."
+
+#### **2:45 – 3:00 | Conclusion**
+*   *Script*: "CampusConnect Hub is fully deployed on Vercel, with database triggers, RLS security policies, and high-speed serverless AI. Thank you for watching!"
+
