@@ -2,7 +2,17 @@ import { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
+import { supabase } from '../../lib/supabase';
 import { Shield, GraduationCap, AlertTriangle, Mail, Lock, User, Building } from 'lucide-react';
+
+const GoogleIcon = () => (
+  <svg className="h-5 w-5 mr-2.5 shrink-0" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05" strokeWidth="0" />
+    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+  </svg>
+);
 
 export default function AuthPage() {
   const { signIn, signUp, validateEducationalEmail } = useAuth();
@@ -24,6 +34,26 @@ export default function AuthPage() {
     } else {
       setEmailValid(null);
     }
+  }
+
+  async function handleGoogleSignIn() {
+    setError('');
+    setSuccess('');
+    setLoading(true);
+    try {
+      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin
+        }
+      });
+      if (oauthError) {
+        setError(oauthError.message);
+      }
+    } catch (err) {
+      setError('Google Sign-In failed. Please try again.');
+    }
+    setLoading(false);
   }
 
   async function handleSubmit(e) {
@@ -64,186 +94,224 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Ambient background effects */}
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 lg:p-12 relative overflow-hidden">
+      {/* Ambient glassmorphic glowing meshes */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-start/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-end/10 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-mid/5 rounded-full blur-3xl" />
+        <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-gradient-to-br from-cyan-500/10 to-transparent rounded-full blur-3xl" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-gradient-to-tr from-indigo-500/10 to-transparent rounded-full blur-3xl" />
       </div>
 
-      <div className="w-full max-w-md relative z-10 animate-fade-in">
-        {/* Logo & Title */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-gradient-start to-gradient-end mb-4 shadow-lg animate-pulse-glow">
-            <GraduationCap className="h-8 w-8 text-white" />
-          </div>
-          <h1 className="text-3xl font-bold gradient-text">CampusConnect Hub</h1>
-          <p className="text-muted-foreground mt-2">Your unified campus ecosystem</p>
-        </div>
-
-        {/* Institutional Accountability Banner */}
-        <div className="glass rounded-xl p-4 mb-6 border border-warning/30 bg-warning/5">
-          <div className="flex items-start gap-3">
-            <Shield className="h-5 w-5 text-warning mt-0.5 shrink-0" />
+      <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-10 items-center relative z-10 animate-fade-in">
+        {/* Left Column: Brand & Security Verification Notice & Google OAuth */}
+        <div className="lg:col-span-6 space-y-8 flex flex-col justify-center">
+          {/* Logo & Header */}
+          <div className="flex items-center gap-3.5">
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-400 to-indigo-500 shadow-lg shadow-cyan-500/20">
+              <GraduationCap className="h-7 w-7 text-white" />
+            </div>
             <div>
-              <p className="text-sm font-semibold text-warning">Institutional Accountability Notice</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                This platform is exclusively for verified students of accredited educational institutions. 
-                All activity is linked to your institutional identity. Misuse, impersonation, or violation 
-                of community guidelines will result in permanent suspension and may be reported to your institution.
-              </p>
+              <h1 className="text-3xl font-extrabold text-slate-50 tracking-tight leading-none">CampusConnect</h1>
+              <p className="text-xs text-cyan-400 font-mono tracking-widest uppercase mt-1">Verified Workspace</p>
             </div>
+          </div>
+
+          <div className="space-y-4">
+            <h2 className="text-3xl lg:text-4xl font-extrabold text-slate-100 leading-tight tracking-tight">
+              A premium space designed <span className="gradient-text">strictly for students</span>.
+            </h2>
+            <p className="text-slate-400 text-sm leading-relaxed max-w-md">
+              Securely trade campus goods, co-lease local housing, recruit hackathon teammates, and utilize advanced AI summaries.
+            </p>
+          </div>
+
+          {/* High-Fidelity Accountability notice block */}
+          <div className="glass rounded-2xl p-6 border-l-4 border-l-amber-500 border-amber-500/30 shadow-xl shadow-amber-500/5 animate-pulse-glow relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-3 opacity-5 pointer-events-none">
+              <Shield className="h-20 w-20 text-amber-400" />
+            </div>
+            <div className="flex items-start gap-4">
+              <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400 shrink-0 h-10 w-10 flex items-center justify-center border border-amber-500/20">
+                <Shield className="h-5.5 w-5.5" />
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-amber-400">Institutional Accountability Notice</h4>
+                <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+                  This workspace is restricted to active students. All interactions require academic authentication (.edu / .ac.uk signature). Misrepresentation or guideline violation will result in suspension and dean-level reporting.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Google OAuth Section */}
+          <div className="glass rounded-2xl p-6 border border-slate-800/80 space-y-4 shadow-xl">
+            <div>
+              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Single Sign-On Authentication</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">Use your institutional Google account for instant registration.</p>
+            </div>
+            <button
+              onClick={handleGoogleSignIn}
+              disabled={loading}
+              className="w-full flex items-center justify-center h-12 rounded-xl bg-slate-900 border border-slate-800 hover:border-cyan-500/30 hover:bg-slate-800/50 active:scale-[0.98] transition-all duration-150 text-slate-200 text-sm font-semibold cursor-pointer shadow-md"
+            >
+              <GoogleIcon />
+              Continue with Google Workspace
+            </button>
           </div>
         </div>
 
-        {/* Auth Card */}
-        <div className="glass rounded-2xl p-6 shadow-xl">
-          {/* Tab Toggle */}
-          <div className="flex rounded-xl bg-secondary/50 p-1 mb-6">
-            <button
-              onClick={() => { setIsLogin(true); setError(''); setSuccess(''); setEmailValid(null); }}
-              className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer ${
-                isLogin
-                  ? 'bg-primary text-white shadow-md'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Sign In
-            </button>
-            <button
-              onClick={() => { setIsLogin(false); setError(''); setSuccess(''); }}
-              className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer ${
-                !isLogin
-                  ? 'bg-primary text-white shadow-md'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Register
-            </button>
-          </div>
+        {/* Right Column: Credentials Auth Card */}
+        <div className="lg:col-span-6">
+          <div className="glass-card rounded-3xl p-8 border border-slate-800/80 shadow-2xl relative overflow-hidden">
+            {/* Ambient inner card glow */}
+            <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-500/5 rounded-full blur-2xl pointer-events-none" />
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {!isLogin && (
-              <>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                    <User className="h-4 w-4 text-muted-foreground" />
-                    Full Name
-                  </label>
-                  <Input
-                    id="auth-fullname"
-                    type="text"
-                    placeholder="Jane Doe"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                    <Building className="h-4 w-4 text-muted-foreground" />
-                    College / University
-                  </label>
-                  <Input
-                    id="auth-college"
-                    type="text"
-                    placeholder="MIT, Stanford, etc."
-                    value={college}
-                    onChange={(e) => setCollege(e.target.value)}
-                    required
-                  />
-                </div>
-              </>
-            )}
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                <Mail className="h-4 w-4 text-muted-foreground" />
-                Email
-              </label>
-              <div className="relative">
-                <Input
-                  id="auth-email"
-                  type="email"
-                  placeholder={isLogin ? 'you@email.com' : 'you@college.edu'}
-                  value={email}
-                  onChange={handleEmailChange}
-                  required
-                  className={
-                    emailValid === false
-                      ? 'border-destructive focus:ring-destructive/50'
-                      : emailValid === true
-                      ? 'border-success focus:ring-success/50'
-                      : ''
-                  }
-                />
-                {!isLogin && emailValid === false && (
-                  <div className="flex items-center gap-1 mt-1.5">
-                    <AlertTriangle className="h-3.5 w-3.5 text-destructive" />
-                    <span className="text-xs text-destructive">Must be a .edu institutional email</span>
-                  </div>
-                )}
-                {!isLogin && emailValid === true && (
-                  <div className="flex items-center gap-1 mt-1.5">
-                    <Shield className="h-3.5 w-3.5 text-success" />
-                    <span className="text-xs text-success">Valid educational domain</span>
-                  </div>
-                )}
-              </div>
+            {/* Toggle tabs */}
+            <div className="flex rounded-xl bg-slate-950/80 p-1 border border-slate-800/55 mb-6">
+              <button
+                onClick={() => { setIsLogin(true); setError(''); setSuccess(''); setEmailValid(null); }}
+                className={`flex-1 py-2.5 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer ${
+                  isLogin
+                    ? 'bg-gradient-to-r from-cyan-500 to-indigo-500 text-white shadow-md'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                Sign In
+              </button>
+              <button
+                onClick={() => { setIsLogin(false); setError(''); setSuccess(''); }}
+                className={`flex-1 py-2.5 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer ${
+                  !isLogin
+                    ? 'bg-gradient-to-r from-cyan-500 to-indigo-500 text-white shadow-md'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                Register Account
+              </button>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                <Lock className="h-4 w-4 text-muted-foreground" />
-                Password
-              </label>
-              <Input
-                id="auth-password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={6}
-              />
-            </div>
-
-            {error && (
-              <div className="rounded-lg bg-destructive/10 border border-destructive/30 p-3 text-sm text-destructive animate-fade-in">
-                {error}
-              </div>
-            )}
-            {success && (
-              <div className="rounded-lg bg-success/10 border border-success/30 p-3 text-sm text-success animate-fade-in">
-                {success}
-              </div>
-            )}
-
-            <Button
-              type="submit"
-              variant="gradient"
-              size="lg"
-              className="w-full"
-              disabled={loading || (!isLogin && emailValid === false)}
-            >
-              {loading ? (
-                <span className="flex items-center gap-2">
-                  <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  {isLogin ? 'Signing in...' : 'Creating account...'}
-                </span>
-              ) : isLogin ? (
-                'Sign In'
-              ) : (
-                'Create Account'
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {!isLogin && (
+                <>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-slate-300 flex items-center gap-2">
+                      <User className="h-3.5 w-3.5 text-cyan-400" />
+                      Full Name
+                    </label>
+                    <Input
+                      id="auth-fullname"
+                      type="text"
+                      placeholder="Jane Doe"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      required
+                      className="bg-slate-950/50 border-slate-800 hover:border-slate-700/80 focus:border-cyan-500/80 focus:ring-cyan-500/10"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-slate-300 flex items-center gap-2">
+                      <Building className="h-3.5 w-3.5 text-cyan-400" />
+                      College / University
+                    </label>
+                    <Input
+                      id="auth-college"
+                      type="text"
+                      placeholder="MIT, Stanford, etc."
+                      value={college}
+                      onChange={(e) => setCollege(e.target.value)}
+                      required
+                      className="bg-slate-950/50 border-slate-800 hover:border-slate-700/80 focus:border-cyan-500/80 focus:ring-cyan-500/10"
+                    />
+                  </div>
+                </>
               )}
-            </Button>
-          </form>
-        </div>
 
-        <p className="text-center text-xs text-muted-foreground mt-6">
-          By using CampusConnect Hub, you agree to uphold academic integrity and community standards.
-        </p>
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-300 flex items-center gap-2">
+                  <Mail className="h-3.5 w-3.5 text-cyan-400" />
+                  Email Address
+                </label>
+                <div className="relative">
+                  <Input
+                    id="auth-email"
+                    type="email"
+                    placeholder={isLogin ? 'you@email.com' : 'you@college.edu'}
+                    value={email}
+                    onChange={handleEmailChange}
+                    required
+                    className={`bg-slate-950/50 border-slate-800 hover:border-slate-700/80 focus:border-cyan-500/80 focus:ring-cyan-500/10 ${
+                      emailValid === false
+                        ? 'border-red-500/50 focus:ring-red-500/10 focus:border-red-500'
+                        : emailValid === true
+                        ? 'border-emerald-500/50 focus:ring-emerald-500/10 focus:border-emerald-500'
+                        : ''
+                    }`}
+                  />
+                  {!isLogin && emailValid === false && (
+                    <div className="flex items-center gap-1.5 mt-2 text-red-400">
+                      <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                      <span className="text-[11px]">Must be a valid institutional domain (.edu)</span>
+                    </div>
+                  )}
+                  {!isLogin && emailValid === true && (
+                    <div className="flex items-center gap-1.5 mt-2 text-emerald-400">
+                      <Shield className="h-3.5 w-3.5 shrink-0" />
+                      <span className="text-[11px]">Authorized educational domain signature detected</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-300 flex items-center gap-2">
+                  <Lock className="h-3.5 w-3.5 text-cyan-400" />
+                  Secret Password
+                </label>
+                <Input
+                  id="auth-password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={6}
+                  className="bg-slate-950/50 border-slate-800 hover:border-slate-700/80 focus:border-cyan-500/80 focus:ring-cyan-500/10"
+                />
+              </div>
+
+              {error && (
+                <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-3.5 text-xs text-red-400 animate-fade-in flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4 shrink-0" />
+                  <span>{error}</span>
+                </div>
+              )}
+              {success && (
+                <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/20 p-3.5 text-xs text-emerald-400 animate-fade-in flex items-center gap-2">
+                  <Shield className="h-4 w-4 shrink-0" />
+                  <span>{success}</span>
+                </div>
+              )}
+
+              <Button
+                type="submit"
+                variant="gradient"
+                size="lg"
+                className="w-full h-11 text-xs font-bold rounded-xl mt-2 select-none shadow-md shadow-cyan-500/10"
+                disabled={loading || (!isLogin && emailValid === false)}
+              >
+                {loading ? (
+                  <span className="flex items-center gap-2.5 justify-center">
+                    <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    {isLogin ? 'Authenticating Credentials...' : 'Registering Academic Signature...'}
+                  </span>
+                ) : isLogin ? (
+                  'Sign In to Workspace'
+                ) : (
+                  'Activate Student Profile'
+                )}
+              </Button>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
   );
