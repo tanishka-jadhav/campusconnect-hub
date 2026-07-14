@@ -9,7 +9,7 @@ import { Badge } from '../ui/Badge';
 import {
   Home, MapPin, DollarSign, BedDouble, Bath, Plus, Search,
   SlidersHorizontal, X, Phone, MessageCircle, Users, Activity,
-  Calendar, Zap, Bus, Users2, ShieldAlert, Sparkles, Heart
+  Calendar, Zap, Bus, Users2, ShieldAlert, Sparkles, Heart, AlertTriangle
 } from 'lucide-react';
 
 const AMENITY_OPTIONS = ['WiFi', 'Parking', 'Laundry', 'Gym', 'Pool', 'AC', 'Furnished', 'Pet-Friendly'];
