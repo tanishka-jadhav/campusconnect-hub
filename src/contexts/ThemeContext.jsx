@@ -4,7 +4,7 @@ const ThemeContext = createContext(null);
 
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('theme') || 'dark';
+    return localStorage.getItem('cc-theme') || 'dark';
   });
 
   useEffect(() => {
@@ -14,7 +14,7 @@ export function ThemeProvider({ children }) {
     } else {
       root.classList.remove('dark');
     }
-    localStorage.setItem('theme', theme);
+    localStorage.setItem('cc-theme', theme);
   }, [theme]);
 
   function toggleTheme() {

@@ -94,48 +94,48 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 lg:p-12 relative overflow-hidden">
+    <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4 lg:p-12 relative overflow-hidden transition-colors duration-200">
       {/* Ambient glassmorphic glowing meshes */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-gradient-to-br from-cyan-500/10 to-transparent rounded-full blur-3xl" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-gradient-to-tr from-indigo-500/10 to-transparent rounded-full blur-3xl" />
+        <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-gradient-to-br from-cyan-500/10 dark:from-cyan-500/5 to-transparent rounded-full blur-3xl" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-gradient-to-tr from-indigo-500/10 dark:from-indigo-500/5 to-transparent rounded-full blur-3xl" />
       </div>
 
-      <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-10 items-center relative z-10 animate-fade-in">
+      <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10 animate-fade-in">
         {/* Left Column: Brand & Security Verification Notice & Google OAuth */}
-        <div className="lg:col-span-6 space-y-8 flex flex-col justify-center">
+        <div className="lg:col-span-6 space-y-6 flex flex-col justify-center">
           {/* Logo & Header */}
           <div className="flex items-center gap-3.5">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-400 to-indigo-500 shadow-lg shadow-cyan-500/20">
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-400 to-indigo-550 shadow-lg shadow-cyan-500/20 shrink-0">
               <GraduationCap className="h-7 w-7 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-extrabold text-slate-50 tracking-tight leading-none">CampusConnect</h1>
-              <p className="text-xs text-cyan-400 font-mono tracking-widest uppercase mt-1">Verified Workspace</p>
+              <h1 className="text-2xl font-extrabold text-foreground tracking-tight leading-none">CampusConnect</h1>
+              <p className="text-xs text-cyan-500 font-mono tracking-widest uppercase mt-1">Verified Workspace</p>
             </div>
           </div>
 
-          <div className="space-y-4">
-            <h2 className="text-3xl lg:text-4xl font-extrabold text-slate-100 leading-tight tracking-tight">
+          <div className="space-y-3">
+            <h2 className="text-3xl lg:text-4xl font-extrabold text-foreground leading-tight tracking-tight">
               A premium space designed <span className="gradient-text">strictly for students</span>.
             </h2>
-            <p className="text-slate-400 text-sm leading-relaxed max-w-md">
+            <p className="text-muted-foreground text-sm leading-relaxed max-w-md">
               Securely trade campus goods, co-lease local housing, recruit hackathon teammates, and utilize advanced AI summaries.
             </p>
           </div>
 
           {/* High-Fidelity Accountability notice block */}
-          <div className="glass rounded-2xl p-6 border-l-4 border-l-amber-500 border-amber-500/30 shadow-xl shadow-amber-500/5 animate-pulse-glow relative overflow-hidden group">
+          <div className="glass rounded-2xl p-6 border-l-4 border-l-amber-500 border-amber-500/30 shadow-xl shadow-amber-550/5 relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-3 opacity-5 pointer-events-none">
-              <Shield className="h-20 w-20 text-amber-400" />
+              <Shield className="h-20 w-20 text-amber-500" />
             </div>
             <div className="flex items-start gap-4">
-              <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400 shrink-0 h-10 w-10 flex items-center justify-center border border-amber-500/20">
+              <div className="p-2 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-450 shrink-0 h-10 w-10 flex items-center justify-center border border-amber-500/20">
                 <Shield className="h-5.5 w-5.5" />
               </div>
               <div>
-                <h4 className="text-sm font-bold text-amber-400">Institutional Accountability Notice</h4>
-                <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+                <h4 className="text-sm font-bold text-amber-600 dark:text-amber-450">Institutional Accountability Notice</h4>
+                <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
                   This workspace is restricted to active students. All interactions require academic authentication (.edu / .ac.uk signature). Misrepresentation or guideline violation will result in suspension and dean-level reporting.
                 </p>
               </div>
@@ -143,15 +143,15 @@ export default function AuthPage() {
           </div>
 
           {/* Google OAuth Section */}
-          <div className="glass rounded-2xl p-6 border border-slate-800/80 space-y-4 shadow-xl">
+          <div className="glass rounded-2xl p-6 border border-border space-y-4 shadow-xl">
             <div>
-              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Single Sign-On Authentication</p>
-              <p className="text-[11px] text-slate-500 mt-0.5">Use your institutional Google account for instant registration.</p>
+              <p className="text-xs text-foreground font-bold uppercase tracking-wider">Single Sign-On Authentication</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">Use your institutional Google account for instant registration.</p>
             </div>
             <button
               onClick={handleGoogleSignIn}
               disabled={loading}
-              className="w-full flex items-center justify-center h-12 rounded-xl bg-slate-900 border border-slate-800 hover:border-cyan-500/30 hover:bg-slate-800/50 active:scale-[0.98] transition-all duration-150 text-slate-200 text-sm font-semibold cursor-pointer shadow-md"
+              className="w-full flex items-center justify-center h-12 rounded-xl bg-card border border-border hover:border-cyan-500/40 hover:bg-secondary/40 active:scale-[0.98] transition-all duration-150 text-foreground text-sm font-semibold cursor-pointer shadow-md"
             >
               <GoogleIcon />
               Continue with Google Workspace
@@ -161,18 +161,18 @@ export default function AuthPage() {
 
         {/* Right Column: Credentials Auth Card */}
         <div className="lg:col-span-6">
-          <div className="glass-card rounded-3xl p-8 border border-slate-800/80 shadow-2xl relative overflow-hidden">
+          <div className="glass-card rounded-3xl p-8 border border-border shadow-2xl relative overflow-hidden">
             {/* Ambient inner card glow */}
             <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-500/5 rounded-full blur-2xl pointer-events-none" />
 
             {/* Toggle tabs */}
-            <div className="flex rounded-xl bg-slate-950/80 p-1 border border-slate-800/55 mb-6">
+            <div className="flex rounded-xl bg-background/50 p-1 border border-border mb-6">
               <button
                 onClick={() => { setIsLogin(true); setError(''); setSuccess(''); setEmailValid(null); }}
                 className={`flex-1 py-2.5 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer ${
                   isLogin
                     ? 'bg-gradient-to-r from-cyan-500 to-indigo-500 text-white shadow-md'
-                    : 'text-slate-400 hover:text-slate-200'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 Sign In
@@ -182,7 +182,7 @@ export default function AuthPage() {
                 className={`flex-1 py-2.5 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer ${
                   !isLogin
                     ? 'bg-gradient-to-r from-cyan-500 to-indigo-500 text-white shadow-md'
-                    : 'text-slate-400 hover:text-slate-200'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 Register Account
@@ -193,8 +193,8 @@ export default function AuthPage() {
               {!isLogin && (
                 <>
                   <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-slate-300 flex items-center gap-2">
-                      <User className="h-3.5 w-3.5 text-cyan-400" />
+                    <label className="text-xs font-semibold text-foreground flex items-center gap-2">
+                      <User className="h-3.5 w-3.5 text-primary" />
                       Full Name
                     </label>
                     <Input
@@ -204,12 +204,12 @@ export default function AuthPage() {
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       required
-                      className="bg-slate-950/50 border-slate-800 hover:border-slate-700/80 focus:border-cyan-500/80 focus:ring-cyan-500/10"
+                      className="bg-secondary/40 border-border focus:border-cyan-500 focus:ring-cyan-500/10"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-slate-300 flex items-center gap-2">
-                      <Building className="h-3.5 w-3.5 text-cyan-400" />
+                    <label className="text-xs font-semibold text-foreground flex items-center gap-2">
+                      <Building className="h-3.5 w-3.5 text-primary" />
                       College / University
                     </label>
                     <Input
@@ -219,15 +219,15 @@ export default function AuthPage() {
                       value={college}
                       onChange={(e) => setCollege(e.target.value)}
                       required
-                      className="bg-slate-950/50 border-slate-800 hover:border-slate-700/80 focus:border-cyan-500/80 focus:ring-cyan-500/10"
+                      className="bg-secondary/40 border-border focus:border-cyan-500 focus:ring-cyan-500/10"
                     />
                   </div>
                 </>
               )}
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-300 flex items-center gap-2">
-                  <Mail className="h-3.5 w-3.5 text-cyan-400" />
+                <label className="text-xs font-semibold text-foreground flex items-center gap-2">
+                  <Mail className="h-3.5 w-3.5 text-primary" />
                   Email Address
                 </label>
                 <div className="relative">
@@ -238,7 +238,7 @@ export default function AuthPage() {
                     value={email}
                     onChange={handleEmailChange}
                     required
-                    className={`bg-slate-950/50 border-slate-800 hover:border-slate-700/80 focus:border-cyan-500/80 focus:ring-cyan-500/10 ${
+                    className={`bg-secondary/40 border-border focus:border-cyan-500 focus:ring-cyan-500/10 ${
                       emailValid === false
                         ? 'border-red-500/50 focus:ring-red-500/10 focus:border-red-500'
                         : emailValid === true
@@ -247,23 +247,23 @@ export default function AuthPage() {
                     }`}
                   />
                   {!isLogin && emailValid === false && (
-                    <div className="flex items-center gap-1.5 mt-2 text-red-400">
+                    <div className="flex items-center gap-1.5 mt-2 text-red-550">
                       <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
-                      <span className="text-[11px]">Must be a valid institutional domain (.edu)</span>
+                      <span className="text-[11px] font-medium">Must be a valid institutional domain (.edu)</span>
                     </div>
                   )}
                   {!isLogin && emailValid === true && (
-                    <div className="flex items-center gap-1.5 mt-2 text-emerald-400">
+                    <div className="flex items-center gap-1.5 mt-2 text-emerald-600 dark:text-emerald-400">
                       <Shield className="h-3.5 w-3.5 shrink-0" />
-                      <span className="text-[11px]">Authorized educational domain signature detected</span>
+                      <span className="text-[11px] font-medium">Authorized domain signature detected</span>
                     </div>
                   )}
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-300 flex items-center gap-2">
-                  <Lock className="h-3.5 w-3.5 text-cyan-400" />
+                <label className="text-xs font-semibold text-foreground flex items-center gap-2">
+                  <Lock className="h-3.5 w-3.5 text-primary" />
                   Secret Password
                 </label>
                 <Input
@@ -274,18 +274,18 @@ export default function AuthPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={6}
-                  className="bg-slate-950/50 border-slate-800 hover:border-slate-700/80 focus:border-cyan-500/80 focus:ring-cyan-500/10"
+                  className="bg-secondary/40 border-border focus:border-cyan-500 focus:ring-cyan-500/10"
                 />
               </div>
 
               {error && (
-                <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-3.5 text-xs text-red-400 animate-fade-in flex items-center gap-2">
+                <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-3.5 text-xs text-red-650 dark:text-red-400 animate-fade-in flex items-center gap-2">
                   <AlertTriangle className="h-4 w-4 shrink-0" />
                   <span>{error}</span>
                 </div>
               )}
               {success && (
-                <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/20 p-3.5 text-xs text-emerald-400 animate-fade-in flex items-center gap-2">
+                <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/20 p-3.5 text-xs text-emerald-600 dark:text-emerald-450 animate-fade-in flex items-center gap-2">
                   <Shield className="h-4 w-4 shrink-0" />
                   <span>{success}</span>
                 </div>
@@ -295,7 +295,7 @@ export default function AuthPage() {
                 type="submit"
                 variant="gradient"
                 size="lg"
-                className="w-full h-11 text-xs font-bold rounded-xl mt-2 select-none shadow-md shadow-cyan-500/10"
+                className="w-full h-11 text-xs font-bold rounded-xl mt-2 select-none shadow-md shadow-cyan-500/10 cursor-pointer"
                 disabled={loading || (!isLogin && emailValid === false)}
               >
                 {loading ? (
