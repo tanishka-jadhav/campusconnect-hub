@@ -3,7 +3,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { supabase } from '../../lib/supabase';
-import { Shield, GraduationCap, AlertTriangle, Mail, Lock, User, Building } from 'lucide-react';
+import { Shield, GraduationCap, AlertTriangle, Mail, Lock, User, Building, Sparkles } from 'lucide-react';
 
 const GoogleIcon = () => (
   <svg className="h-5 w-5 mr-2.5 shrink-0" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
@@ -50,6 +50,44 @@ export default function AuthPage() {
     setShowGoogleMock(true);
   }
 
+  // 1-Click Demo Login bypass
+  async function handleQuickDemoLogin() {
+    setError('');
+    setSuccess('');
+    setLoading(true);
+    const demoEmail = 'demo@college.edu';
+    const demoPassword = 'demopassword123';
+    
+    try {
+      // 1. Attempt to sign in directly
+      const { data, error: signinError } = await signIn(demoEmail, demoPassword);
+      
+      if (signinError) {
+        // 2. If account does not exist in the database, automatically register it first
+        if (
+          signinError.message.includes('Invalid login credentials') || 
+          signinError.message.includes('invalid_credentials') || 
+          signinError.message.includes('not found')
+        ) {
+          const { error: signupError } = await signUp(demoEmail, demoPassword, 'Demo Student', 'Campus Connect University');
+          
+          if (signupError) {
+            setError(signupError.message);
+          } else {
+            // 3. Retry signing in after silent registration
+            const { error: signinRetryError } = await signIn(demoEmail, demoPassword);
+            if (signinRetryError) setError(signinRetryError.message);
+          }
+        } else {
+          setError(signinError.message);
+        }
+      }
+    } catch (err) {
+      setError('Demo login failed. Please register manually instead.');
+    }
+    setLoading(false);
+  }
+
   async function handleMockGoogleSubmit(e) {
     e.preventDefault();
     setError('');
@@ -62,14 +100,11 @@ export default function AuthPage() {
     }
 
     const mockPassword = 'mock-google-sso-pass-9921';
-    const emailDomain = mockEmail.split('@')[1];
 
     try {
-      // 1. Attempt dynamic signup
       const { data, error: signupError } = await signUp(mockEmail, mockPassword, mockName, 'University Member');
       
       if (signupError) {
-        // 2. If user already exists, authenticate directly with the fallback password
         if (signupError.message.includes('already registered') || signupError.message.includes('User already registered') || signupError.message.includes('already exists')) {
           const { error: signinError } = await signIn(mockEmail, mockPassword);
           if (signinError) {
@@ -178,20 +213,32 @@ export default function AuthPage() {
             </div>
           </div>
 
-          {/* Google OAuth Section */}
+          {/* Google OAuth & Demo Section */}
           <div className="glass rounded-2xl p-6 border border-border space-y-4 shadow-xl">
             <div>
-              <p className="text-xs text-foreground font-bold uppercase tracking-wider">Single Sign-On Authentication</p>
-              <p className="text-[11px] text-muted-foreground mt-0.5">Use your institutional Google account for instant registration.</p>
+              <p className="text-xs text-foreground font-bold uppercase tracking-wider">SSO & Instant Authentication</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">Access the campus network instantly using SSO simulation or one-click demo login.</p>
             </div>
-            <button
-              onClick={handleGoogleSignIn}
-              disabled={loading}
-              className="w-full flex items-center justify-center h-12 rounded-xl bg-card border border-border hover:border-cyan-500/40 hover:bg-secondary/40 active:scale-[0.98] transition-all duration-150 text-foreground text-sm font-semibold cursor-pointer shadow-md"
-            >
-              <GoogleIcon />
-              Continue with Google Workspace
-            </button>
+            
+            <div className="space-y-3">
+              <button
+                onClick={handleGoogleSignIn}
+                disabled={loading}
+                className="w-full flex items-center justify-center h-12 rounded-xl bg-card border border-border hover:border-cyan-500/40 hover:bg-secondary/40 active:scale-[0.98] transition-all duration-150 text-foreground text-sm font-semibold cursor-pointer shadow-md"
+              >
+                <GoogleIcon />
+                Continue with Google Workspace
+              </button>
+
+              <button
+                onClick={handleQuickDemoLogin}
+                disabled={loading}
+                className="w-full flex items-center justify-center h-12 rounded-xl bg-gradient-to-r from-cyan-500/20 to-indigo-500/20 border border-cyan-500/35 hover:border-cyan-500/60 active:scale-[0.98] transition-all duration-150 text-cyan-400 text-sm font-bold cursor-pointer shadow-md"
+              >
+                <Sparkles className="h-4.5 w-4.5 mr-2 shrink-0 text-cyan-400" />
+                1-Click Demo Login
+              </button>
+            </div>
           </div>
         </div>
 
