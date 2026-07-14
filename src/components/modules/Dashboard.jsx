@@ -58,7 +58,7 @@ export default function Dashboard({ onNavigate }) {
   ];
 
   return (
-    <div className="space-y-6 animate-fade-in text-foreground">
+    <div className="space-y-6 animate-fade-in text-foreground w-full">
       {/* Welcome Banner */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
@@ -75,7 +75,7 @@ export default function Dashboard({ onNavigate }) {
       </div>
 
       {/* Grid of 4 Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
         {/* Housing telemetry card */}
         <Card className="glass-card hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group cursor-pointer p-6" onClick={() => onNavigate('housing')}>
           <div className="absolute top-[-20%] right-[-10%] w-24 h-24 bg-cyan-500/5 rounded-full blur-xl pointer-events-none group-hover:bg-cyan-500/10 transition-colors" />
