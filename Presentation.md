@@ -1,6 +1,29 @@
+---
+marp: true
+theme: gaia
+_class: lead
+paginate: true
+backgroundColor: #020617
+color: #f8fafc
+style: |
+  section {
+    font-family: 'Outfit', 'Inter', sans-serif;
+    padding: 40px;
+  }
+  h1, h2 {
+    color: #06b6d4;
+  }
+  h3 {
+    color: #a78bfa;
+  }
+  footer {
+    color: #64748b;
+  }
+---
+
 # CampusConnect Hub: Presentation Slides
 
-This document is formatted as a slide deck presentation. You can view the slides sequentially or export this structure to standard presentation tools.
+You can view these slides sequentially or export this structure to a standard PowerPoint (.pptx) file.
 
 ---
 
