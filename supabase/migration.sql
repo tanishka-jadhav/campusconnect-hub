@@ -300,7 +300,20 @@ CREATE TRIGGER resources_updated_at
   EXECUTE FUNCTION update_updated_at_column();
 
 -- ============================================================
--- 7. INDEXES for query performance
+-- 7. SECURE DELETION PROCEDURE (RPC)
+-- Allows a student to delete their own account from the client
+-- ============================================================
+CREATE OR REPLACE FUNCTION delete_user_account()
+RETURNS VOID AS $$
+BEGIN
+  -- Cascading logic: Deleting from auth.users cascades to public.profiles,
+  -- which cascades to all tables due to ON DELETE CASCADE references.
+  DELETE FROM auth.users WHERE id = auth.uid();
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- ============================================================
+-- 8. INDEXES for query performance
 -- ============================================================
 CREATE INDEX IF NOT EXISTS idx_housing_active ON listings_housing(is_active, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_housing_rent ON listings_housing(rent);
