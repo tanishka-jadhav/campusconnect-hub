@@ -18,6 +18,13 @@ CREATE TABLE IF NOT EXISTS profiles (
   email_domain TEXT DEFAULT '',
   avatar_url TEXT DEFAULT '',
   bio TEXT DEFAULT '',
+  
+  -- Lifestyle parameters for roommate matcher telemetry
+  lifestyle_sleep TEXT DEFAULT 'Flexible',        -- Night Owl, Early Bird, Flexible
+  lifestyle_cleanliness INTEGER DEFAULT 3,        -- Scale 1-5
+  lifestyle_study TEXT DEFAULT 'Library',          -- In Room, Library, Flexible
+  lifestyle_noise INTEGER DEFAULT 3,              -- Scale 1-5 (preference for quietness)
+  
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -72,6 +79,14 @@ CREATE TABLE IF NOT EXISTS listings_housing (
   contact_phone TEXT DEFAULT '',
   contact_whatsapp TEXT DEFAULT '',
   is_active BOOLEAN DEFAULT TRUE,
+  
+  -- Academic cycle and lease configuration
+  academic_term TEXT DEFAULT 'Full Year',         -- Fall Semester, Spring Semester, Summer Term, Full Year
+  split_billing BOOLEAN DEFAULT FALSE,
+  max_occupants INTEGER DEFAULT 2,
+  proximity_gate TEXT DEFAULT '',                 -- e.g. "5 min walk to Engineering Gate"
+  shuttle_connected BOOLEAN DEFAULT FALSE,
+  
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -289,6 +304,9 @@ CREATE TRIGGER resources_updated_at
 -- ============================================================
 CREATE INDEX IF NOT EXISTS idx_housing_active ON listings_housing(is_active, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_housing_rent ON listings_housing(rent);
+CREATE INDEX IF NOT EXISTS idx_housing_term ON listings_housing(academic_term);
+CREATE INDEX IF NOT EXISTS idx_housing_occupants ON listings_housing(max_occupants);
+
 CREATE INDEX IF NOT EXISTS idx_marketplace_active ON listings_marketplace(is_sold, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_marketplace_category ON listings_marketplace(category);
 CREATE INDEX IF NOT EXISTS idx_teams_open ON project_teams(is_open, created_at DESC);
@@ -296,11 +314,4 @@ CREATE INDEX IF NOT EXISTS idx_career_active ON career_board(is_active, created_
 CREATE INDEX IF NOT EXISTS idx_career_type ON career_board(type);
 CREATE INDEX IF NOT EXISTS idx_resources_category ON resources(category, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_profiles_domain ON profiles(email_domain);
-
--- ============================================================
--- 8. STORAGE BUCKET for file uploads
--- Run this separately if needed:
--- ============================================================
--- INSERT INTO storage.buckets (id, name, public)
--- VALUES ('resources', 'resources', true)
--- ON CONFLICT (id) DO NOTHING;
+CREATE INDEX IF NOT EXISTS idx_profiles_sleep ON profiles(lifestyle_sleep);
