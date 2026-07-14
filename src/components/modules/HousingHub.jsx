@@ -26,6 +26,7 @@ function CreateListingForm({ onClose, onCreated }) {
     proximity_gate: '', shuttle_connected: false
   });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   function toggleAmenity(amenity) {
     setForm((prev) => ({
@@ -39,231 +40,316 @@ function CreateListingForm({ onClose, onCreated }) {
   async function handleSubmit(e) {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.from('listings_housing').insert({
-      user_id: user.id,
-      title: form.title,
-      description: form.description,
-      address: form.address,
-      rent: parseFloat(form.rent),
-      bedrooms: parseInt(form.bedrooms),
-      bathrooms: parseInt(form.bathrooms),
-      amenities: form.amenities,
-      contact_phone: form.contact_phone,
-      contact_whatsapp: form.contact_whatsapp,
-      academic_term: form.academic_term,
-      split_billing: form.split_billing,
-      max_occupants: parseInt(form.max_occupants),
-      proximity_gate: form.proximity_gate,
-      shuttle_connected: form.shuttle_connected,
-      is_active: true,
-    });
-    setLoading(false);
-    if (!error) {
-      onCreated();
-      onClose();
+    setError('');
+
+    try {
+      // 1. Self-healing: Check if user profile exists in profiles table. If missing, silently create it.
+      const { data: profileCheck, error: checkError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', user.id)
+        .single();
+
+      if (checkError && checkError.code !== 'PGRST116') {
+        setError(`Database check error: ${checkError.message}`);
+        setLoading(false);
+        return;
+      }
+
+      if (!profileCheck) {
+        const emailDomain = user.email ? user.email.split('@')[1] : 'college.edu';
+        const { error: profileError } = await supabase.from('profiles').insert({
+          id: user.id,
+          email: user.email || 'demo@college.edu',
+          full_name: user.user_metadata?.full_name || 'Demo Student',
+          college: user.user_metadata?.college || 'Campus Connect University',
+          email_domain: emailDomain,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        });
+
+        if (profileError) {
+          setError(`Profile auto-creation failed: ${profileError.message}. Make sure profiles table is synced.`);
+          setLoading(false);
+          return;
+        }
+      }
+
+      // 2. Insert housing listing
+      const { error: insertError } = await supabase.from('listings_housing').insert({
+        user_id: user.id,
+        title: form.title,
+        description: form.description,
+        address: form.address,
+        rent: parseFloat(form.rent),
+        bedrooms: parseInt(form.bedrooms),
+        bathrooms: parseInt(form.bathrooms),
+        amenities: form.amenities,
+        contact_phone: form.contact_phone,
+        contact_whatsapp: form.contact_whatsapp,
+        academic_term: form.academic_term,
+        split_billing: form.split_billing,
+        max_occupants: parseInt(form.max_occupants),
+        proximity_gate: form.proximity_gate,
+        shuttle_connected: form.shuttle_connected,
+        is_active: true,
+      });
+
+      if (insertError) {
+        setError(insertError.message);
+      } else {
+        onCreated();
+        onClose();
+      }
+    } catch (err) {
+      setError('An unexpected database query error occurred. Please try again.');
     }
+    setLoading(false);
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-md overflow-y-auto transition-colors duration-200">
-      <div className="glass-card rounded-2xl p-6 w-full max-w-lg border border-slate-800/60 max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between mb-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-md overflow-y-auto transition-colors duration-200 animate-fade-in">
+      <div className="glass-card rounded-2xl p-6 w-full max-w-lg border border-slate-800/60 max-h-[90vh] overflow-y-auto relative shadow-2xl bg-slate-900/50">
+        {/* Modal Header */}
+        <div className="flex items-center justify-between mb-5 border-b border-slate-800/50 pb-3">
           <div>
-            <h2 className="text-xl font-extrabold text-foreground flex items-center gap-2">
+            <h2 className="text-lg font-extrabold text-foreground flex items-center gap-2">
               <Home className="h-5 w-5 text-primary" />
               List Your Property
             </h2>
-            <p className="text-xs text-muted-foreground mt-1 font-medium">Publish local housing options for campus peers</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">Publish local housing options for campus peers</p>
           </div>
           <Button
             variant="ghost"
             size="icon"
             onClick={onClose}
-            className="h-10 w-10 flex items-center justify-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary/60"
+            className="h-9 w-9 flex items-center justify-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary/60 cursor-pointer"
           >
-            <X className="h-5 w-5" />
+            <X className="h-4.5 w-4.5" />
           </Button>
         </div>
+
+        {/* Error Feedback block */}
+        {error && (
+          <div className="rounded-xl bg-red-500/10 border border-red-500/25 p-3.5 mb-4 text-xs text-red-400 flex items-start gap-2.5 animate-fade-in">
+            <AlertTriangle className="h-4 w-4 shrink-0 text-red-400 mt-0.5" />
+            <div className="min-w-0">
+              <span className="font-bold">Publishing Failed:</span>
+              <p className="mt-1 font-medium leading-relaxed">{error}</p>
+            </div>
+          </div>
+        )}
         
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-1">
-            <label className="text-xs font-semibold text-foreground">Listing Title</label>
-            <Input
-              id="housing-title"
-              placeholder="e.g., Cosy 2-Bedroom near North Campus Library"
-              value={form.title}
-              onChange={(e) => setForm({ ...form, title: e.target.value })}
-              required
-              className="bg-secondary/40 border-border focus:border-primary"
-            />
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-xs font-semibold text-foreground">Detailed Description</label>
-            <Textarea
-              id="housing-desc"
-              placeholder="Describe rent terms, roommates details, distances to campus, utilities, etc..."
-              value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
-              required
-              className="bg-secondary/40 border-border min-h-[90px] focus:border-primary"
-            />
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-xs font-semibold text-foreground">Address / Location</label>
-            <Input
-              id="housing-address"
-              placeholder="e.g., 402 University Ave, Apt B"
-              value={form.address}
-              onChange={(e) => setForm({ ...form, address: e.target.value })}
-              required
-              className="bg-secondary/40 border-border focus:border-primary"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
+        <form onSubmit={handleSubmit} className="space-y-4 text-left">
+          {/* SECTION 1: BASIC PROPERTY DETAILS */}
+          <div className="space-y-3">
+            <h3 className="text-[10px] uppercase font-extrabold text-muted-foreground tracking-wider border-b border-slate-800/30 pb-1 flex items-center gap-1.5">
+              <span>🏠 Basic Property Details</span>
+            </h3>
+            
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-foreground block">Lease Term Period</label>
-              <select
-                value={form.academic_term}
-                onChange={(e) => setForm({ ...form, academic_term: e.target.value })}
-                className="h-10 w-full rounded-xl border border-slate-800 bg-secondary/40 px-3 text-xs font-semibold text-foreground cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/10"
-              >
-                {TERM_OPTIONS.map((t) => (
-                  <option key={t} value={t}>{t}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-foreground">Max Occupants</label>
+              <label className="text-[11px] font-semibold text-foreground">Listing Title</label>
               <Input
-                type="number"
-                min="1"
-                max="10"
-                value={form.max_occupants}
-                onChange={(e) => setForm({ ...form, max_occupants: e.target.value })}
-                className="bg-secondary/40 border-border focus:border-primary"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-3 gap-3">
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-foreground">Rent ($/mo)</label>
-              <Input
-                id="housing-rent"
-                type="number"
-                min="0"
-                placeholder="800"
-                value={form.rent}
-                onChange={(e) => setForm({ ...form, rent: e.target.value })}
+                id="housing-title"
+                placeholder="e.g. Cozy 2-Bedroom near North Campus Gate"
+                value={form.title}
+                onChange={(e) => setForm({ ...form, title: e.target.value })}
                 required
-                className="bg-secondary/40 border-border focus:border-primary"
+                className="bg-secondary/40 border-slate-800 text-xs focus:border-primary w-full"
               />
             </div>
+
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-foreground">Bedrooms</label>
-              <Input
-                id="housing-beds"
-                type="number"
-                min="0"
-                max="10"
-                value={form.bedrooms}
-                onChange={(e) => setForm({ ...form, bedrooms: e.target.value })}
-                className="bg-secondary/40 border-border focus:border-primary"
+              <label className="text-[11px] font-semibold text-foreground">Detailed Description</label>
+              <Textarea
+                id="housing-desc"
+                placeholder="Describe rent parameters, roommates details, utilities, distances, etc..."
+                value={form.description}
+                onChange={(e) => setForm({ ...form, description: e.target.value })}
+                required
+                className="bg-secondary/40 border-slate-800 text-xs min-h-[70px] focus:border-primary w-full"
               />
             </div>
+
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-foreground">Bathrooms</label>
+              <label className="text-[11px] font-semibold text-foreground">Address / Street Location</label>
               <Input
-                id="housing-baths"
-                type="number"
-                min="0"
-                max="10"
-                value={form.bathrooms}
-                onChange={(e) => setForm({ ...form, bathrooms: e.target.value })}
-                className="bg-secondary/40 border-border focus:border-primary"
+                id="housing-address"
+                placeholder="e.g. 402 University Ave, Apt B"
+                value={form.address}
+                onChange={(e) => setForm({ ...form, address: e.target.value })}
+                required
+                className="bg-secondary/40 border-slate-800 text-xs focus:border-primary w-full"
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 pt-1">
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-foreground">Campus Proximity Gate / Walk</label>
-              <Input
-                placeholder="e.g. 5 min walk to Engineering Gate"
-                value={form.proximity_gate}
-                onChange={(e) => setForm({ ...form, proximity_gate: e.target.value })}
-                className="bg-secondary/40 border-border focus:border-primary"
-              />
+          {/* SECTION 2: LEASE & CALENDAR SPECIFICATIONS */}
+          <div className="space-y-3 pt-1">
+            <h3 className="text-[10px] uppercase font-extrabold text-muted-foreground tracking-wider border-b border-slate-800/30 pb-1 flex items-center gap-1.5">
+              <span>🗓️ Lease & Occupancy Specs</span>
+            </h3>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-foreground block">Academic Lease Term</label>
+                <select
+                  value={form.academic_term}
+                  onChange={(e) => setForm({ ...form, academic_term: e.target.value })}
+                  className="h-10 w-full rounded-xl border border-slate-800 bg-secondary/40 px-3 text-xs font-semibold text-foreground cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/10"
+                >
+                  {TERM_OPTIONS.map((t) => (
+                    <option key={t} value={t} className="bg-slate-900 text-foreground font-semibold">{t}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-foreground">Max Occupants Allowed</label>
+                <Input
+                  type="number"
+                  min="1"
+                  max="10"
+                  value={form.max_occupants}
+                  onChange={(e) => setForm({ ...form, max_occupants: e.target.value })}
+                  className="bg-secondary/40 border-slate-800 text-xs focus:border-primary w-full"
+                  required
+                />
+              </div>
             </div>
 
-            <div className="flex items-center gap-2 pt-6">
-              <input
-                type="checkbox"
-                id="form-shuttle"
-                checked={form.shuttle_connected}
-                onChange={(e) => setForm({ ...form, shuttle_connected: e.target.checked })}
-                className="h-4.5 w-4.5 rounded bg-secondary/40 border-slate-800 text-primary focus:ring-primary/10"
-              />
-              <label htmlFor="form-shuttle" className="text-xs font-semibold text-foreground cursor-pointer select-none">
-                Campus Shuttle Route Nearby
-              </label>
+            <div className="grid grid-cols-3 gap-3">
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-foreground">Rent ($/mo)</label>
+                <Input
+                  id="housing-rent"
+                  type="number"
+                  min="0"
+                  placeholder="800"
+                  value={form.rent}
+                  onChange={(e) => setForm({ ...form, rent: e.target.value })}
+                  required
+                  className="bg-secondary/40 border-slate-800 text-xs focus:border-primary w-full"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-foreground">Bedrooms</label>
+                <Input
+                  id="housing-beds"
+                  type="number"
+                  min="0"
+                  max="10"
+                  value={form.bedrooms}
+                  onChange={(e) => setForm({ ...form, bedrooms: e.target.value })}
+                  className="bg-secondary/40 border-slate-800 text-xs focus:border-primary w-full"
+                  required
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-foreground">Bathrooms</label>
+                <Input
+                  id="housing-baths"
+                  type="number"
+                  min="0"
+                  max="10"
+                  value={form.bathrooms}
+                  onChange={(e) => setForm({ ...form, bathrooms: e.target.value })}
+                  className="bg-secondary/40 border-slate-800 text-xs focus:border-primary w-full"
+                  required
+                />
+              </div>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-foreground block">Amenities Included</label>
-            <div className="flex flex-wrap gap-1.5">
-              {AMENITY_OPTIONS.map((a) => {
-                const selected = form.amenities.includes(a);
-                return (
-                  <button
-                    key={a}
-                    type="button"
-                    onClick={() => toggleAmenity(a)}
-                    className={`h-9 px-3 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center ${
-                      selected
-                        ? 'bg-primary/20 text-primary border border-primary/45'
-                        : 'bg-secondary/40 text-muted-foreground border border-border hover:border-primary/45'
-                    }`}
-                  >
-                    {a}
-                  </button>
-                );
-              })}
+          {/* SECTION 3: LOCAL PROXIMITY & SERVICES */}
+          <div className="space-y-3 pt-1">
+            <h3 className="text-[10px] uppercase font-extrabold text-muted-foreground tracking-wider border-b border-slate-800/30 pb-1 flex items-center gap-1.5">
+              <span>🗺️ Local Proximity & Services</span>
+            </h3>
+
+            <div className="grid grid-cols-2 gap-3 items-center">
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-foreground">Proximity to Gate</label>
+                <Input
+                  placeholder="e.g. 5 min walk to Library"
+                  value={form.proximity_gate}
+                  onChange={(e) => setForm({ ...form, proximity_gate: e.target.value })}
+                  className="bg-secondary/40 border-slate-800 text-xs focus:border-primary w-full"
+                />
+              </div>
+
+              <div className="flex items-center gap-2.5 pt-5 pl-1">
+                <input
+                  type="checkbox"
+                  id="form-shuttle"
+                  checked={form.shuttle_connected}
+                  onChange={(e) => setForm({ ...form, shuttle_connected: e.target.checked })}
+                  className="h-4.5 w-4.5 rounded bg-secondary/40 border-slate-800 text-primary focus:ring-primary/10 cursor-pointer"
+                />
+                <label htmlFor="form-shuttle" className="text-xs font-semibold text-foreground cursor-pointer select-none">
+                  Shuttle Route Connected
+                </label>
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-semibold text-foreground block">Amenities Included</label>
+              <div className="flex flex-wrap gap-1">
+                {AMENITY_OPTIONS.map((a) => {
+                  const selected = form.amenities.includes(a);
+                  return (
+                    <button
+                      key={a}
+                      type="button"
+                      onClick={() => toggleAmenity(a)}
+                      className={`h-8 px-2.5 rounded-lg text-[10px] font-bold tracking-tight transition-all cursor-pointer flex items-center border ${
+                        selected
+                          ? 'bg-primary/20 text-primary border-primary/40'
+                          : 'bg-secondary/35 text-muted-foreground border-slate-800/80 hover:border-primary/40'
+                      }`}
+                    >
+                      {a}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 pt-2">
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-foreground">Phone Number</label>
-              <Input
-                id="housing-phone"
-                placeholder="e.g., +15550199"
-                value={form.contact_phone}
-                onChange={(e) => setForm({ ...form, contact_phone: e.target.value })}
-                className="bg-secondary/40 border-border focus:border-primary"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-foreground">WhatsApp Number</label>
-              <Input
-                id="housing-wa"
-                placeholder="e.g., +15550199"
-                value={form.contact_whatsapp}
-                onChange={(e) => setForm({ ...form, contact_whatsapp: e.target.value })}
-                className="bg-secondary/40 border-border focus:border-primary"
-              />
+          {/* SECTION 4: CONTACT & PEER OUTREACH */}
+          <div className="space-y-3 pt-1">
+            <h3 className="text-[10px] uppercase font-extrabold text-muted-foreground tracking-wider border-b border-slate-800/30 pb-1 flex items-center gap-1.5">
+              <span>📞 Outreach Details</span>
+            </h3>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-foreground">Phone Number</label>
+                <Input
+                  id="housing-phone"
+                  placeholder="e.g. +15550199"
+                  value={form.contact_phone}
+                  onChange={(e) => setForm({ ...form, contact_phone: e.target.value })}
+                  className="bg-secondary/40 border-slate-800 text-xs focus:border-primary w-full"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-foreground">WhatsApp Number</label>
+                <Input
+                  id="housing-wa"
+                  placeholder="e.g. +15550199"
+                  value={form.contact_whatsapp}
+                  onChange={(e) => setForm({ ...form, contact_whatsapp: e.target.value })}
+                  className="bg-secondary/40 border-slate-800 text-xs focus:border-primary w-full"
+                />
+              </div>
             </div>
           </div>
 
           <Button
             type="submit"
             variant="gradient"
-            className="w-full h-11 font-bold rounded-xl mt-4 cursor-pointer"
+            className="w-full h-11 font-extrabold rounded-xl mt-5 cursor-pointer shadow-md select-none"
             disabled={loading}
           >
             {loading ? 'Publishing listing...' : 'Publish Listing'}
