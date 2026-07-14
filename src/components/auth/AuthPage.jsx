@@ -3,7 +3,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { supabase } from '../../lib/supabase';
-import { Shield, GraduationCap, AlertTriangle, Mail, Lock, User, Building, Sparkles } from 'lucide-react';
+import { Shield, GraduationCap, AlertTriangle, Mail, Lock, User, Building, Sparkles, Eye, EyeOff } from 'lucide-react';
 
 const GoogleIcon = () => (
   <svg className="h-5 w-5 mr-2.5 shrink-0" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
@@ -30,6 +30,7 @@ export default function AuthPage() {
   const [showGoogleMock, setShowGoogleMock] = useState(false);
   const [mockName, setMockName] = useState('');
   const [mockEmail, setMockEmail] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   function handleEmailChange(e) {
     const val = e.target.value;
@@ -349,16 +350,25 @@ export default function AuthPage() {
                   <Lock className="h-3.5 w-3.5 text-primary" />
                   Secret Password
                 </label>
-                <Input
-                  id="auth-password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  minLength={6}
-                  className="bg-secondary/40 border-border focus:border-cyan-500 focus:ring-cyan-500/10"
-                />
+                <div className="relative">
+                  <Input
+                    id="auth-password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    minLength={6}
+                    className="bg-secondary/40 border-border focus:border-cyan-500 focus:ring-cyan-500/10 pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="h-4.5 w-4.5" /> : <Eye className="h-4.5 w-4.5" />}
+                  </button>
+                </div>
               </div>
 
               {error && (
