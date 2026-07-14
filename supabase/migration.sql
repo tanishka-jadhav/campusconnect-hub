@@ -328,3 +328,9 @@ CREATE INDEX IF NOT EXISTS idx_career_type ON career_board(type);
 CREATE INDEX IF NOT EXISTS idx_resources_category ON resources(category, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_profiles_domain ON profiles(email_domain);
 CREATE INDEX IF NOT EXISTS idx_profiles_sleep ON profiles(lifestyle_sleep);
+
+-- ============================================================
+-- 9. RELOAD SCHEMA CACHE
+-- Forces PostgREST to recognize the newly added columns immediately
+-- ============================================================
+NOTIFY pgrst, 'reload schema';
