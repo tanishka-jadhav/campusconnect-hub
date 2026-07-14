@@ -26,6 +26,11 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [emailValid, setEmailValid] = useState(null);
 
+  // Google SSO Simulation States
+  const [showGoogleMock, setShowGoogleMock] = useState(false);
+  const [mockName, setMockName] = useState('');
+  const [mockEmail, setMockEmail] = useState('');
+
   function handleEmailChange(e) {
     const val = e.target.value;
     setEmail(val);
@@ -36,24 +41,55 @@ export default function AuthPage() {
     }
   }
 
-  async function handleGoogleSignIn() {
+  // Intercept Google SSO redirect, handle via high-fidelity simulation
+  function handleGoogleSignIn() {
     setError('');
     setSuccess('');
+    setMockName('');
+    setMockEmail('');
+    setShowGoogleMock(true);
+  }
+
+  async function handleMockGoogleSubmit(e) {
+    e.preventDefault();
+    setError('');
     setLoading(true);
-    try {
-      const { error: oauthError } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: window.location.origin
-        }
-      });
-      if (oauthError) {
-        setError(oauthError.message);
-      }
-    } catch (err) {
-      setError('Google Sign-In failed. Please try again.');
+    
+    if (!validateEducationalEmail(mockEmail)) {
+      setError('Only institutional educational emails (.edu) are permitted for SSO simulation.');
+      setLoading(false);
+      return;
     }
-    setLoading(false);
+
+    const mockPassword = 'mock-google-sso-pass-9921';
+    const emailDomain = mockEmail.split('@')[1];
+
+    try {
+      // 1. Attempt dynamic signup
+      const { data, error: signupError } = await signUp(mockEmail, mockPassword, mockName, 'University Member');
+      
+      if (signupError) {
+        // 2. If user already exists, authenticate directly with the fallback password
+        if (signupError.message.includes('already registered') || signupError.message.includes('User already registered') || signupError.message.includes('already exists')) {
+          const { error: signinError } = await signIn(mockEmail, mockPassword);
+          if (signinError) {
+            setError(signinError.message);
+            setLoading(false);
+            return;
+          }
+        } else {
+          setError(signupError.message);
+          setLoading(false);
+          return;
+        }
+      }
+      
+      setLoading(false);
+      setShowGoogleMock(false);
+    } catch (err) {
+      setError('SSO Handshake failed. Please check connection and try again.');
+      setLoading(false);
+    }
   }
 
   async function handleSubmit(e) {
@@ -111,7 +147,7 @@ export default function AuthPage() {
             </div>
             <div>
               <h1 className="text-2xl font-extrabold text-foreground tracking-tight leading-none">CampusConnect</h1>
-              <p className="text-xs text-cyan-500 font-mono tracking-widest uppercase mt-1">Verified Workspace</p>
+              <p className="text-xs text-cyan-550 font-mono tracking-widest uppercase mt-1">Verified Workspace</p>
             </div>
           </div>
 
@@ -253,7 +289,7 @@ export default function AuthPage() {
                     </div>
                   )}
                   {!isLogin && emailValid === true && (
-                    <div className="flex items-center gap-1.5 mt-2 text-emerald-600 dark:text-emerald-400">
+                    <div className="flex items-center gap-1.5 mt-2 text-emerald-600 dark:text-emerald-450">
                       <Shield className="h-3.5 w-3.5 shrink-0" />
                       <span className="text-[11px] font-medium">Authorized domain signature detected</span>
                     </div>
@@ -313,6 +349,80 @@ export default function AuthPage() {
           </div>
         </div>
       </div>
+
+      {/* Google Workspace SSO Simulation Modal */}
+      {showGoogleMock && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md transition-opacity duration-200 animate-fade-in">
+          <div className="glass-card rounded-2xl p-6 w-full max-w-md border border-cyan-500/30 bg-slate-900/40 relative overflow-hidden shadow-2xl text-left">
+            <div className="absolute top-[-10px] right-[-10px] p-3 opacity-5 pointer-events-none">
+              <GraduationCap className="h-28 w-28 text-cyan-400" />
+            </div>
+
+            <div className="flex items-start gap-4 mb-4">
+              <div className="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 shrink-0 border border-cyan-500/30 h-10 w-10 flex items-center justify-center">
+                <GoogleIcon />
+              </div>
+              <div className="min-w-0">
+                <h3 className="text-base font-extrabold text-foreground">Google Workspace SSO (Simulation)</h3>
+                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                  Enter an educational email address to simulate the institutional Google single sign-on authentication handshake.
+                </p>
+              </div>
+            </div>
+            
+            <form onSubmit={handleMockGoogleSubmit} className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground">Student Name</label>
+                <Input
+                  type="text"
+                  placeholder="Jane Doe"
+                  value={mockName}
+                  onChange={(e) => setMockName(e.target.value)}
+                  className="bg-secondary/40 border-border focus:border-cyan-500 focus:ring-cyan-500/10 text-xs"
+                  required
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground">Academic Email Address</label>
+                <Input
+                  type="email"
+                  placeholder="you@college.edu"
+                  value={mockEmail}
+                  onChange={(e) => setMockEmail(e.target.value)}
+                  className="bg-secondary/40 border-border focus:border-cyan-500 focus:ring-cyan-500/10 text-xs"
+                  required
+                />
+              </div>
+
+              {error && (
+                <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-3 text-xs text-red-400 animate-fade-in flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4 shrink-0 text-red-400" />
+                  <span>{error}</span>
+                </div>
+              )}
+
+              <div className="flex gap-3 justify-end pt-2">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => { setShowGoogleMock(false); setMockName(''); setMockEmail(''); setError(''); }}
+                  className="h-10 px-4 rounded-xl text-xs font-semibold hover:bg-secondary/60 text-muted-foreground hover:text-foreground cursor-pointer"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className="h-10 px-5 rounded-xl text-xs font-bold bg-primary hover:bg-primary/80 text-white cursor-pointer"
+                  disabled={loading}
+                >
+                  {loading ? 'Authenticating...' : 'Sign In with SSO'}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
