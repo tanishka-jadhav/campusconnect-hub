@@ -353,7 +353,7 @@ export default function HousingHub() {
 
       {/* Property Cards Layout Grid */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {[1, 2, 3].map((i) => (
             <div key={i} className="glass-card rounded-2xl p-6 h-72 shimmer-bg" />
           ))}
@@ -368,7 +368,7 @@ export default function HousingHub() {
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filtered.map((listing) => (
             <Card key={listing.id} className="group glass-card flex flex-col justify-between overflow-hidden p-6">
               <div>

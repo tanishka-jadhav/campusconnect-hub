@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import AuthPage from './components/auth/AuthPage';
 import AppLayout from './components/layout/AppLayout';
+import Dashboard from './components/modules/Dashboard';
 import HousingHub from './components/modules/HousingHub';
 import Marketplace from './components/modules/Marketplace';
 import TeamUp from './components/modules/TeamUp';
@@ -10,14 +12,14 @@ import Resources from './components/modules/Resources';
 
 function AppContent() {
   const { user, loading } = useAuth();
-  const [activeModule, setActiveModule] = useState('housing');
+  const [activeModule, setActiveModule] = useState('dashboard');
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center animate-fade-in">
           <div className="w-12 h-12 border-3 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground text-sm">Loading CampusConnect...</p>
+          <p className="text-muted-foreground text-sm font-medium">Loading CampusConnect...</p>
         </div>
       </div>
     );
@@ -29,6 +31,8 @@ function AppContent() {
 
   function renderModule() {
     switch (activeModule) {
+      case 'dashboard':
+        return <Dashboard onNavigate={setActiveModule} />;
       case 'housing':
         return <HousingHub />;
       case 'marketplace':
@@ -40,7 +44,7 @@ function AppContent() {
       case 'resources':
         return <Resources />;
       default:
-        return <HousingHub />;
+        return <Dashboard onNavigate={setActiveModule} />;
     }
   }
 
@@ -50,8 +54,6 @@ function AppContent() {
     </AppLayout>
   );
 }
-
-import { ThemeProvider } from './contexts/ThemeContext';
 
 export default function App() {
   return (

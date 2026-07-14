@@ -4,10 +4,11 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../ui/Button';
 import {
   Home, ShoppingBag, Users, Briefcase, FolderOpen,
-  LogOut, GraduationCap, Menu, X, ChevronRight, Sun, Moon
+  LogOut, GraduationCap, Menu, X, ChevronRight, Sun, Moon, LayoutDashboard
 } from 'lucide-react';
 
 const NAV_ITEMS = [
+  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, color: 'text-indigo-500' },
   { id: 'housing', label: 'Housing Hub', icon: Home, color: 'text-cyan-500' },
   { id: 'marketplace', label: 'Marketplace', icon: ShoppingBag, color: 'text-orange-500' },
   { id: 'teamup', label: 'Team-Up', icon: Users, color: 'text-emerald-505' },
@@ -30,12 +31,12 @@ export default function AppLayout({ activeModule, onNavigate, children }) {
       <aside className="hidden lg:flex flex-col w-72 border-r border-border bg-card/30 backdrop-blur-xl shadow-2xl h-screen sticky top-0 z-30 shrink-0 transition-colors duration-200">
         {/* Brand Header */}
         <div className="p-6 border-b border-border flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-gradient-to-br from-cyan-400 to-indigo-500 shadow-md shadow-cyan-500/10 shrink-0">
+          <div className="p-2.5 rounded-xl bg-gradient-to-br from-cyan-400 to-indigo-550 shadow-md shadow-cyan-500/10 shrink-0">
             <GraduationCap className="h-6 w-6 text-white" />
           </div>
           <div>
             <h1 className="font-extrabold text-foreground tracking-tight leading-none text-base">CampusConnect</h1>
-            <p className="text-[10px] text-cyan-500 font-mono tracking-widest uppercase mt-1">Academic Portal</p>
+            <p className="text-[10px] text-cyan-550 font-mono tracking-widest uppercase mt-1">Academic Portal</p>
           </div>
         </div>
 
@@ -119,7 +120,7 @@ export default function AppLayout({ activeModule, onNavigate, children }) {
           <aside className="absolute inset-y-0 left-0 w-80 bg-background dark:bg-slate-900 border-r border-border z-50 animate-drawer-in flex flex-col shadow-2xl transition-colors duration-200">
             <div className="p-6 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-gradient-to-br from-cyan-400 to-indigo-500 shadow-md">
+                <div className="p-2.5 rounded-xl bg-gradient-to-br from-cyan-400 to-indigo-550 shadow-md">
                   <GraduationCap className="h-6 w-6 text-white" />
                 </div>
                 <div>
@@ -135,7 +136,7 @@ export default function AppLayout({ activeModule, onNavigate, children }) {
                 onClick={() => setSidebarOpen(false)}
                 className="h-11 w-11 flex items-center justify-center hover:bg-secondary/60 rounded-xl"
               >
-                <X className="h-5 w-5 text-muted-foreground hover:text-foreground" />
+                <X className="h-5 w-5" />
               </Button>
             </div>
 
@@ -224,7 +225,7 @@ export default function AppLayout({ activeModule, onNavigate, children }) {
             <span className="font-extrabold text-sm tracking-tight text-foreground">CampusConnect</span>
           </div>
 
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-400 to-indigo-500 flex items-center justify-center text-white text-xs font-bold shadow-md">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-400 to-indigo-550 flex items-center justify-center text-white text-xs font-bold shadow-md">
             {(profile?.full_name || user?.email || 'U')[0].toUpperCase()}
           </div>
         </header>
